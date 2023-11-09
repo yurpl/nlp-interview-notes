@@ -1,0 +1,6 @@
+- Generate next word condition on previous output as well as input
+- We continue generating until we get to a stop token
+- Inference: need to compute the argmax over the word predictions and then feed that to the next transformer call
+- Decoder is advanced one state at a time until STOP is reached
+- The encoder can just be run a single time 
+- Training: same as language model training, maximize the probability of the gold sequence y now conditioned on the input x

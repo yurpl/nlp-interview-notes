@@ -1,0 +1,25 @@
+- [[Instruction Tuning]] uses labelled data. Several limitations to this
+	- As models get larger, low-quality datasets will limit their capabilities
+	- A model cannot necessarily generalize to new tasks beyond those in the tuning datasets
+- Can we generate outputs from SOTA models on new problems, then get reward signals from humans?
+- Ouyang 2022
+## Idea: humans give comparisons of two system outputs 
+- Collect demonstration data and train a supervised policy
+- Collect comparison data and train a reward model
+- Formally:
+	- Base language model p(y|x) assigns probabilities to completions. Train this in advance.
+	- Reward model r(x, y) maps completions y to real-valued scores 
+	- Data for reward model: collect two LM completions $(y_1, y_2)$ for a single input x
+	- x can be almost anything
+	- Annotators label $y_1 > y_2$ (y1 preferred to y2, or y2 preferred to y1) 
+	- Learn r using a Bradley-Terry model 
+	- $P(y_1>y_2)=\frac{exp(r(x, y_1))}{exp(r(x, y_1))+exp(r(x, y_2))}$ (softmax over the r values)
+		- This turns scores into log probs of 1 being preferred to 2, we learn a continuous scoring function, not a classifier
+	- Do RL with PPO, optimize expected reward
+		- $E_{x\~D,y\~p(.|x)}[r(x,y)]$
+		- Ideal scenario: p continually gets better and better, reward model can now judge those new, better completions and drive it to get better. This may be better than instruction tuning which is stuck with the provided labeled data
+- Very different data distribution from instruct-tuning datasets
+## Is RL necessary?
+- A series of recent model achieve a strong performance with supervised performance
+- RL is often brittle, reward models may not be working as well as we'd like
+- As of mid-2023, GPT-4 is far ahead though. 
